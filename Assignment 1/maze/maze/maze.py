@@ -140,46 +140,88 @@ class Maze():
         return result
 
     # plese finish the solve function that help the machine to figure out how to actually get from point A to point B
-    def solve(self):
-        """ Finds a solution to maze, if one exists, '"""
+    def solve(self, method="BFS"):
+        """ 
+        Finds a solution to maze, if one exists, default method is 'DFS'.
+        :param: method: string, 'DFS' or 'BFS', default is 'DFS'
+        """
+        
 
-        # ================================= DFS =========================================
-        # Keep track of number of states explored
-        self.num_explored = 0
+        if method == 'DFS':
 
-        # Initialize frontier to just the starting position
-        start = Node(state = self.start, parent = None, action = None)
+            # ================================= DFS =========================================
+            # Keep track of number of states explored
+            self.num_explored = 0
 
-        # Initialize a solution as a stack
-        frontier = StackFrontier()
-        frontier.add(start)
+            # Initialize frontier to just the starting position
+            start = Node(state = self.start, parent = None, action = None)
 
-        self.explored = []
+            # Initialize a solution as a stack
+            frontier = StackFrontier()
+            frontier.add(start)
 
+            self.explored = []
 
-        while (frontier.contains_state(self.goal) == False) and (frontier.empty() == False):
-            
-            current_node = frontier.pop()
-            self.explored.append(current_node.state)
-            if len(self.neighbors(current_node.state)) != 0:
-                for (action, state) in self.neighbors(current_node.state):
-                    if state not in self.explored:
-                        frontier.add(Node(state, current_node, action))
-                    
-        if frontier.contains_state(self.goal):
-            self.solution = []
-            goal_node = frontier.contains_state(self.goal)
-            current_node = goal_node
-            while current_node.state != self.start:
-                self.solution.append(current_node.state)
-                current_node = current_node.parent
+            while (frontier.contains_state(self.goal) == False) and (frontier.empty() == False):
+                
+                current_node = frontier.remove()
+                self.explored.append(current_node.state)
+                self.num_explored += 1
+                if len(self.neighbors(current_node.state)) != 0:
+                    for (action, state) in self.neighbors(current_node.state):
+                        if state not in self.explored:
+                            frontier.add(Node(state, current_node, action))
+                        
+            if frontier.contains_state(self.goal):
+                self.solution = []
+                goal_node = frontier.contains_state(self.goal)
+                current_node = goal_node
+                while current_node.parent != None:
+                    self.solution.append(current_node.state)
+                    current_node = current_node.parent
+                
+                self.solution = [[], self.solution]
 
-            
+                
 
 
         # ================================ BFS =========================================
+        if method == 'BFS':
 
+            # ================================= DFS =========================================
+            # Keep track of number of states explored
+            self.num_explored = 0
 
+            # Initialize frontier to just the starting position
+            start = Node(state = self.start, parent = None, action = None)
+
+            # Initialize a solution as a stack
+            frontier = QueueFrontier()
+            frontier.add(start)
+
+            self.explored = []
+
+            while (frontier.contains_state(self.goal) == False) and (frontier.empty() == False):
+                
+                current_node = frontier.remove()
+                self.explored.append(current_node.state)
+                self.num_explored += 1
+                if len(self.neighbors(current_node.state)) != 0:
+                    for (action, state) in self.neighbors(current_node.state):
+                        if state not in self.explored:
+                            frontier.add(Node(state, current_node, action))
+                        
+            if frontier.contains_state(self.goal):
+                self.solution = []
+                goal_node = frontier.contains_state(self.goal)
+                current_node = goal_node
+                while current_node.parent != None:
+                    self.solution.append(current_node.state)
+                    current_node = current_node.parent
+                
+                self.solution = [[], self.solution]
+
+                
 
                     
 
