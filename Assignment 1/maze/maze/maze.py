@@ -133,7 +133,7 @@ class Maze():
         result = []
         for action, (r,c) in candidates:
             try:
-                if not self.walls[r][c]: # self.walls[r][c] == True --> blocked
+                if not self.walls[r][c] and (r >= 0) and (c >= 0): # self.walls[r][c] == True --> blocked; assume positive index!
                     result.append((action, (r,c)))
             except IndexError:
                 continue
@@ -148,79 +148,45 @@ class Maze():
         
 
         if method == 'DFS':
-
-            # ================================= DFS =========================================
-            # Keep track of number of states explored
-            self.num_explored = 0
-
-            # Initialize frontier to just the starting position
-            start = Node(state = self.start, parent = None, action = None)
-
-            # Initialize a solution as a stack
             frontier = StackFrontier()
-            frontier.add(start)
-
-            self.explored = []
-
-            while (frontier.contains_state(self.goal) == False) and (frontier.empty() == False):
-                
-                current_node = frontier.remove()
-                self.explored.append(current_node.state)
-                self.num_explored += 1
-                if len(self.neighbors(current_node.state)) != 0:
-                    for (action, state) in self.neighbors(current_node.state):
-                        if state not in self.explored:
-                            frontier.add(Node(state, current_node, action))
-                        
-            if frontier.contains_state(self.goal):
-                self.solution = []
-                goal_node = frontier.contains_state(self.goal)
-                current_node = goal_node
-                while current_node.parent != None:
-                    self.solution.append(current_node.state)
-                    current_node = current_node.parent
-                
-                self.solution = [[], self.solution]
-
-                
-
-
-        # ================================ BFS =========================================
-        if method == 'BFS':
-
-            # ================================= DFS =========================================
-            # Keep track of number of states explored
-            self.num_explored = 0
-
-            # Initialize frontier to just the starting position
-            start = Node(state = self.start, parent = None, action = None)
-
-            # Initialize a solution as a stack
+        else:
             frontier = QueueFrontier()
-            frontier.add(start)
+            
 
-            self.explored = []
+        # ================================= DFS =========================================
+        # Keep track of number of states explored
+        self.num_explored = 0
 
-            while (frontier.contains_state(self.goal) == False) and (frontier.empty() == False):
-                
-                current_node = frontier.remove()
-                self.explored.append(current_node.state)
-                self.num_explored += 1
-                if len(self.neighbors(current_node.state)) != 0:
-                    for (action, state) in self.neighbors(current_node.state):
-                        if state not in self.explored:
-                            frontier.add(Node(state, current_node, action))
-                        
-            if frontier.contains_state(self.goal):
-                self.solution = []
-                goal_node = frontier.contains_state(self.goal)
-                current_node = goal_node
-                while current_node.parent != None:
-                    self.solution.append(current_node.state)
-                    current_node = current_node.parent
-                
-                self.solution = [[], self.solution]
+        # Initialize frontier to just the starting position
+        start = Node(state = self.start, parent = None, action = None)
 
+        # Initialize a solution as a stack
+        frontier = StackFrontier()
+        frontier.add(start)
+
+        self.explored = []
+
+        while (frontier.contains_state(self.goal) == False) and (frontier.empty() == False):
+            
+            current_node = frontier.remove()
+            self.explored.append(current_node.state)
+            self.num_explored += 1
+            if len(self.neighbors(current_node.state)) != 0:
+                for (action, state) in self.neighbors(current_node.state):
+                    if (state not in self.explored) and (not frontier.contains_state(state)):
+                        frontier.add(Node(state, current_node, action))
+                        if state == self.goal:
+                            break
+                    
+        if frontier.contains_state(self.goal):
+            self.solution = []
+            goal_node = frontier.contains_state(self.goal)
+            current_node = goal_node
+            while current_node.parent != None:
+                self.solution.append(current_node.state)
+                current_node = current_node.parent
+            
+            self.solution = [[], self.solution]
                 
 
                     
@@ -292,6 +258,17 @@ print("Solution:")
 m.print()
 m.output_image("maze.png")
 # m.output_image("maze.png", show_explored = True)
+
+# debug
+# print(len(m.explored))
+# print(len(set(m.explored)))
+# walls = 0
+# for (r,c) in m.explored:
+#     if m.walls[r][c]:
+#         walls += 1
+# print(walls)
+# print(m.explored)
+
     
 
 
