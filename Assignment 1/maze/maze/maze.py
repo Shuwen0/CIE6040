@@ -1,7 +1,6 @@
 
 import sys
 
-
 class Node():
     def __init__(self,state,parent,action):
         self.state = state
@@ -128,7 +127,7 @@ class Maze():
             ("left", (row, col -1)),
             ("right", (row, col +1))
         ]
-
+        
         # Ensure action are valid 
         result = []
         for action, (r,c) in candidates:
@@ -146,22 +145,18 @@ class Maze():
         :param: method: string, 'DFS' or 'BFS', default is 'DFS'
         """
         
-
+        # Initialize a solution as a stack
         if method == 'DFS':
             frontier = StackFrontier()
         else:
             frontier = QueueFrontier()
             
 
-        # ================================= DFS =========================================
         # Keep track of number of states explored
         self.num_explored = 0
 
         # Initialize frontier to just the starting position
         start = Node(state = self.start, parent = None, action = None)
-
-        # Initialize a solution as a stack
-        frontier = StackFrontier()
         frontier.add(start)
 
         self.explored = []
