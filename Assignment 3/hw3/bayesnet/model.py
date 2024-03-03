@@ -1,55 +1,50 @@
 from pomegranate import *
 
-# Rain node has no parents
-rain = Node(DiscreteDistribution({
-    "none": 0.7,
-    "light": 0.2,
-    "heavy": 0.1
-}), name="rain")
+# Node A has no parents and is defined by a discrete distribution
+A = Node(DiscreteDistribution({
+    '+a': 0.1,
+    '-a': 0.9
+}), name="A")
 
-# Track maintenance node is conditional on rain
-maintenance = Node(ConditionalProbabilityTable([
-    ["none", "yes", 0.4],
-    ["none", "no", 0.6],
-    ["light", "yes", 0.2],
-    ["light", "no", 0.8],
-    ["heavy", "yes", 0.1],
-    ["heavy", "no", 0.9]
-], [rain.distribution]), name="maintenance")
+# Node B has no parents and is defined by a discrete distribution
+B = Node(DiscreteDistribution({
+    '+b': 0.9,
+    '-b': 0.1
+}), name="B")
 
-# Train node is conditional on rain and maintenance
-train = Node(ConditionalProbabilityTable([
-    ["none", "yes", "on time", 0.8],
-    ["none", "yes", "delayed", 0.2],
-    ["none", "no", "on time", 0.9],
-    ["none", "no", "delayed", 0.1],
-    ["light", "yes", "on time", 0.6],
-    ["light", "yes", "delayed", 0.4],
-    ["light", "no", "on time", 0.7],
-    ["light", "no", "delayed", 0.3],
-    ["heavy", "yes", "on time", 0.4],
-    ["heavy", "yes", "delayed", 0.6],
-    ["heavy", "no", "on time", 0.5],
-    ["heavy", "no", "delayed", 0.5],
-], [rain.distribution, maintenance.distribution]), name="train")
+# Node C is conditional on A and B
+C = Node(ConditionalProbabilityTable([
+    ['+a', '+b', '+c', 0.2],
+    ['+a', '+b', '-c', 0.8],
+    ['+a', '-b', '+c', 0.6],
+    ['+a', '-b', '-c', 0.4],
+    ['-a', '+b', '+c', 0.5],
+    ['-a', '+b', '-c', 0.5],
+    ['-a', '-b', '+c', 0.0],
+    ['-a', '-b', '-c', 1.0],
+], [A.distribution, B.distribution]), name="C")
 
-# Appointment node is conditional on train
-appointment = Node(ConditionalProbabilityTable([
-    ["on time", "attend", 0.9],
-    ["on time", "miss", 0.1],
-    ["delayed", "attend", 0.6],
-    ["delayed", "miss", 0.4]
-], [train.distribution]), name="appointment")
+# Node D is conditional on B and C
+D = Node(ConditionalProbabilityTable([
+    ['+b', '+c', '+d', 0.75],
+    ['+b', '+c', '-d', 0.25],
+    ['+b', '-c', '+d', 0.1],
+    ['+b', '-c', '-d', 0.9],
+    ['-b', '+c', '+d', 0.5],
+    ['-b', '+c', '-d', 0.5],
+    ['-b', '-c', '+d', 0.2],
+    ['-b', '-c', '-d', 0.8],
+], [B.distribution, C.distribution]), name="D")
 
 # Create a Bayesian Network and add states
 model = BayesianNetwork()
-model.add_states(rain, maintenance, train, appointment)
+model.add_states(A, B, C, D)
 
 # Add edges connecting nodes
-model.add_edge(rain, maintenance)
-model.add_edge(rain, train)
-model.add_edge(maintenance, train)
-model.add_edge(train, appointment)
+model.add_edge(A, C)
+model.add_edge(B, C)
+model.add_edge(B, D)
+model.add_edge(C, D)
 
 # Finalize model
 model.bake()

@@ -4,7 +4,7 @@ from collections import Counter
 
 from model import model
 
-def generate_sample():
+def generate_sample(model):
 
     # Mapping of random variable name to sample generated
     sample = {}
@@ -29,13 +29,35 @@ def generate_sample():
     # Return generated sample
     return sample
 
-# Rejection sampling
-# Compute distribution of Appointment given that train is delayed
-N = 10000
-data = []
-for i in range(N):
-    sample = generate_sample()
-    if sample["train"] == "delayed":
-        data.append(sample["appointment"])
-print(Counter(data))
+def rejection_sampling(model, condition_function, variables_of_interest, N=10000):
+    data = []
+    for _ in range(N):
+        sample = generate_sample(model)
+        if condition_function(sample):
+            data.append({var: sample[var] for var in variables_of_interest})
+    return Counter(tuple(d.items()) for d in data)
+
+
+def condition_for_d_given_c(sample):
+    # This is the condition function for P(d | c)
+    return sample['C'] == '+c'
+
+def condition_for_d_given_not_a_and_b(sample):
+    # This is the condition function for P(d | ¬a, b)
+    return sample['A'] == '-a' and sample['B'] == '+b'
+
+# Add a function to print the results according to the conditions (observations)
+def print_results(counter, condition):
+    print(f"Observation: {condition}:")
+    print(counter)
+
+# VCalculate conditional probability based on the requirements in pdf, i.e. P(d | c) and P(d | ¬a, b)
+counter_d_given_c = rejection_sampling(model, condition_for_d_given_c, ['D'])
+counter_d_given_not_a_and_b = rejection_sampling(model, condition_for_d_given_not_a_and_b, ['D'])
+
+# Print the results
+print_results(counter_d_given_c, "c")
+print_results(counter_d_given_not_a_and_b, "(-a, b)")
+
+
 
