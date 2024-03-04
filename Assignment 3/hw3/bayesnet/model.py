@@ -1,3 +1,5 @@
+# !pip install pomegranate==v0.14.9 (make sure to use the old version!)
+
 from pomegranate import *
 
 # Node A has no parents and is defined by a discrete distribution
