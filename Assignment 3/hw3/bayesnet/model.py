@@ -4,8 +4,8 @@ from pomegranate import *
 
 # Node A has no parents and is defined by a discrete distribution
 A = Node(DiscreteDistribution({
-    '+a': 0.1,
-    '-a': 0.9
+    '+a': 0.0,
+    '-a': 1.0
 }), name="A")
 
 # Node B has no parents and is defined by a discrete distribution
