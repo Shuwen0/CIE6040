@@ -34,7 +34,7 @@ def rejection_sampling(model, condition_function, variables_of_interest, N=10000
     for _ in range(N):
         sample = generate_sample(model)
         if condition_function(sample):
-            data.append({var: sample[var] for var in variables_of_interest})
+            data.append({sample[var] for var in variables_of_interest})
     return Counter(tuple(d.items()) for d in data)
 
 
