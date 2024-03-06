@@ -29,13 +29,14 @@ def generate_sample(model):
     # Return generated sample
     return sample
 
-def rejection_sampling(model, condition_function, variables_of_interest, N=10000):
+def rejection_sampling(model, condition_function, variable_of_interest, N=10000):
     data = []
     for _ in range(N):
         sample = generate_sample(model)
         if condition_function(sample):
-            data.append({sample[var] for var in variables_of_interest})
-    return Counter(tuple(d.items()) for d in data)
+            data.append(sample[variable_of_interest])
+    # print(data[:10]) # debug
+    return Counter(data)
 
 
 def condition_for_d_given_c(sample):
@@ -52,8 +53,8 @@ def print_results(counter, condition):
     print(counter)
 
 # VCalculate conditional probability based on the requirements in pdf, i.e. P(d | c) and P(d | ¬a, b)
-counter_d_given_c = rejection_sampling(model, condition_for_d_given_c, ['D'])
-counter_d_given_not_a_and_b = rejection_sampling(model, condition_for_d_given_not_a_and_b, ['D'])
+counter_d_given_c = rejection_sampling(model, condition_for_d_given_c, 'D')
+counter_d_given_not_a_and_b = rejection_sampling(model, condition_for_d_given_not_a_and_b, 'D')
 
 # Print the results
 print_results(counter_d_given_c, "c")
